@@ -10,6 +10,10 @@ from typing import List, Optional
 import uuid
 from datetime import datetime
 import asyncio
+import sys
+
+# Add the backend directory to the path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from kucoin_service import kucoin_client
 
 ROOT_DIR = Path(__file__).parent
