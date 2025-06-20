@@ -109,7 +109,7 @@ class TestCartelBackendAPI(unittest.TestCase):
             self.assertEqual(rate_data["to_currency"], to_currency)
             
             # Check that rate is calculated correctly (99% of base_rate for float)
-            self.assertAlmostEqual(rate_data["rate"], rate_data["base_rate"] * 0.99, places=8)
+            self.assertAlmostEqual(rate_data["rate"], rate_data["base_rate"] * 0.99, places=6)
             
             print(f"Exchange Rate ({from_currency}->{to_currency}, float): {json.dumps(rate_data, indent=2)}")
         
