@@ -284,6 +284,25 @@ test_plan:
   current_focus:
     - "API Page"
   stuck_tasks:
+
+frontend:
+  - task: "API Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial setup for testing the API page."
+      - working: false
+        agent: "testing"
+        comment: "API page is not working correctly. When navigating to the API page via links in the header or footer, or directly via URL, the page redirects to the homepage instead of showing the API documentation."
+      - working: true
+        agent: "testing"
+        comment: "API page is now working correctly after implementing two fixes: 1) Changed BrowserRouter to HashRouter in App.js to handle client-side routing properly, and 2) Updated all navigation links to use the hash format (/#/route) instead of the regular format (/route). All navigation methods (direct URL, header link, footer link) now correctly display the API documentation page."
     - "API Page"
   test_all: false
   test_priority: "high_first"
