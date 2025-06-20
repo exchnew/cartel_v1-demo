@@ -38,11 +38,11 @@ const Header = ({ onMobileMenuToggle, mobileMenuOpen }) => {
         
         <nav className={`main-navigation ${mobileMenuOpen ? 'active' : ''}`}>
           <ul className="nav-list">
-            <li><a href="/terms">Terms & Conditions</a></li>
-            <li><a href="/privacy">Privacy Policy</a></li>
-            <li><a href="/support">Support</a></li>
-            <li><a href="/partners">Partners</a></li>
-            <li><a href="/api">API</a></li>
+            <li><a href="/#/terms">Terms & Conditions</a></li>
+            <li><a href="/#/privacy">Privacy Policy</a></li>
+            <li><a href="/#/support">Support</a></li>
+            <li><a href="/#/partners">Partners</a></li>
+            <li><a href="/#/api">API</a></li>
           </ul>
         </nav>
         
