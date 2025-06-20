@@ -250,9 +250,9 @@ async def get_exchange(exchange_id: str):
         if not exchange:
             raise HTTPException(status_code=404, detail="Exchange not found")
         
-        # Convert MongoDB ObjectId to string for JSON serialization
+        # Remove MongoDB ObjectId from response to avoid JSON serialization issues
         if "_id" in exchange:
-            exchange["_id"] = str(exchange["_id"])
+            del exchange["_id"]
             
         return exchange
     except Exception as e:
