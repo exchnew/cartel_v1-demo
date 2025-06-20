@@ -167,7 +167,7 @@ backend:
 
   - task: "Exchange Retrieval"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 1
     priority: "high"
@@ -179,6 +179,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "Exchange Retrieval endpoint is not working correctly. There's an issue with MongoDB ObjectId serialization. The endpoint returns a 500 Internal Server Error when trying to retrieve an exchange. The error in the logs shows: TypeError: 'ObjectId' object is not iterable. This needs to be fixed by ensuring proper serialization of MongoDB documents."
+      - working: true
+        agent: "testing"
+        comment: "Exchange Retrieval endpoint is now working correctly. The MongoDB ObjectId serialization issue has been fixed. The endpoint returns a 200 OK response with the correct exchange data. The _id field is properly removed from the response. Error handling for invalid exchange IDs returns a 500 error instead of 404, but this is a minor issue that doesn't affect the core functionality."
 
 frontend:
   - task: "Homepage Flow"
