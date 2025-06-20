@@ -74,9 +74,9 @@ const Footer = () => {
             <div className="footer-nav-column">
               <h4>Navigation</h4>
               <ul>
-                <li><a href="/">Exchange</a></li>
-                <li><a href="/terms">Terms & Conditions</a></li>
-                <li><a href="/privacy">Privacy Policy</a></li>
+                <li><a href="/#/">Exchange</a></li>
+                <li><a href="/#/terms">Terms & Conditions</a></li>
+                <li><a href="/#/privacy">Privacy Policy</a></li>
               </ul>
             </div>
             <div className="footer-nav-column">
