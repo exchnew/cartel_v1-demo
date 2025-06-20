@@ -32,7 +32,17 @@ const Header = ({ onMobileMenuToggle, mobileMenuOpen }) => {
       <div className="container header-container">
         <div className="logo-container">
           <a href="/" className="logo">
-            <span>CARTEL</span>
+            <img 
+              src="/images/cartel-logo.png" 
+              alt="CARTEL" 
+              className="logo-image"
+              onError={(e) => {
+                // Fallback to text if image fails to load
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'block';
+              }}
+            />
+            <span className="logo-text" style={{display: 'none'}}>CARTEL</span>
           </a>
         </div>
         
