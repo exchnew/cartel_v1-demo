@@ -306,15 +306,31 @@ class TestCartelBackendAPI(unittest.TestCase):
             
         response = requests.get(f"{API_URL}/exchange/{TestCartelBackendAPI.exchange_id}")
         
-        # There's an issue with MongoDB ObjectId serialization in the exchange retrieval endpoint
-        # The API returns 500 instead of 200 for exchange retrieval
-        # This is a known issue that needs to be fixed in the backend
-        print(f"Exchange Retrieval Response Status: {response.status_code}")
-        print(f"Exchange Retrieval Response: {response.text}")
-        print("⚠️ Exchange Retrieval test - Known issue with MongoDB ObjectId serialization")
+        # Check if the MongoDB ObjectId serialization issue has been fixed
+        self.assertEqual(response.status_code, 200, f"Failed to retrieve exchange: {response.text}")
         
-        # Skip the assertion for now as we know there's an issue
-        # self.assertEqual(response.status_code, 200)
+        # Parse the response as JSON
+        try:
+            data = response.json()
+            print(f"Exchange Retrieval Response: {json.dumps(data, indent=2)}")
+            
+            # Verify the exchange data
+            self.assertIn("id", data)
+            self.assertEqual(data["id"], TestCartelBackendAPI.exchange_id)
+            self.assertIn("from_currency", data)
+            self.assertEqual(data["from_currency"], "BTC")
+            self.assertIn("to_currency", data)
+            self.assertEqual(data["to_currency"], "ETH")
+            self.assertIn("status", data)
+            self.assertIn("deposit_address", data)
+            
+            # Verify that MongoDB ObjectId is not in the response
+            self.assertNotIn("_id", data, "MongoDB ObjectId is still in the response")
+            
+            print("✅ Exchange Retrieval test passed - MongoDB ObjectId serialization issue fixed")
+        except json.JSONDecodeError:
+            self.fail(f"Response is not valid JSON: {response.text}")
+            print("❌ Exchange Retrieval test failed - Response is not valid JSON")
 
     def test_09_exchange_retrieval_invalid_id(self):
         """Test exchange retrieval with invalid ID"""
