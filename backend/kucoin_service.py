@@ -46,12 +46,7 @@ class KuCoinClient:
                 logger.error("KuCoin credentials not found in environment variables")
                 return
                 
-            self.client = Client(
-                api_key=api_key,
-                api_secret=api_secret,
-                api_passphrase=api_passphrase,
-                sandbox=False
-            )
+            self.client = Client(api_key, api_secret, api_passphrase, sandbox=False)
             logger.info("KuCoin client initialized successfully")
             
         except Exception as e:
