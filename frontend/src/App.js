@@ -82,9 +82,9 @@ const Footer = () => {
             <div className="footer-nav-column">
               <h4>Resources</h4>
               <ul>
-                <li><a href="/support">Support</a></li>
-                <li><a href="/partners">Partners</a></li>
-                <li><a href="/api">API Documentation</a></li>
+                <li><a href="/#/support">Support</a></li>
+                <li><a href="/#/partners">Partners</a></li>
+                <li><a href="/#/api">API Documentation</a></li>
               </ul>
             </div>
             <div className="footer-nav-column">
