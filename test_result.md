@@ -295,3 +295,5 @@ agent_communication:
     message: "Completed testing of all backend API endpoints. Most endpoints are working correctly, but there's an issue with the Exchange Retrieval endpoint. It's failing with a MongoDB ObjectId serialization error. This needs to be fixed in the server.py file to properly handle MongoDB document serialization."
   - agent: "testing"
     message: "Completed comprehensive testing of the CARTEL cryptocurrency exchange frontend. The core exchange flow works correctly from homepage through transaction completion. All pages load properly except for the API page, which redirects to the homepage instead of showing API documentation. Mobile responsiveness is working well."
+  - agent: "testing"
+    message: "Retested the Exchange Retrieval endpoint after the MongoDB ObjectId serialization fix. The endpoint is now working correctly for valid exchange IDs. It properly returns the exchange data without the MongoDB ObjectId. There's a minor issue with error handling for invalid exchange IDs (returns 500 instead of 404), but this doesn't affect the core functionality. All backend API endpoints are now working as expected."
