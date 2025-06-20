@@ -166,7 +166,7 @@ async def get_currencies():
 
 @api_router.get("/price")
 async def get_exchange_rate(from_currency: str, to_currency: str, rate_type: str = "float"):
-    """Get exchange rate between two currencies"""
+    """Get exchange rate between two currencies using KuCoin API"""
     try:
         # Validate currencies
         from_curr = from_currency.upper()
@@ -175,39 +175,68 @@ async def get_exchange_rate(from_currency: str, to_currency: str, rate_type: str
         if from_curr == to_curr:
             raise HTTPException(status_code=400, detail="From and to currencies cannot be the same")
         
-        # Get base rate
-        rate_key = f"{from_curr}_{to_curr}"
-        base_rate = DEMO_RATES.get(rate_key)
+        # Try to get real rate from KuCoin
+        real_rate = await kucoin_client.get_price(from_curr, to_curr)
         
-        if base_rate is None:
-            # Try reverse rate
-            reverse_key = f"{to_curr}_{from_curr}"
-            reverse_rate = DEMO_RATES.get(reverse_key)
-            if reverse_rate:
-                base_rate = 1 / reverse_rate
+        if real_rate:
+            # Apply fees based on rate type
+            if rate_type == "fixed":
+                # Fixed rate: 2% fee
+                final_rate = real_rate * 0.98
             else:
-                # Generate random rate if not found
-                base_rate = round(float(hash(rate_key) % 10000) / 100, 8)
-        
-        # Apply fees based on rate type
-        if rate_type == "fixed":
-            # Fixed rate: 2% fee
-            final_rate = base_rate * 0.98
-        else:
-            # Float rate: 1% fee  
-            final_rate = base_rate * 0.99
+                # Float rate: 1% fee  
+                final_rate = real_rate * 0.99
             
-        return {
-            "code": "200000",
-            "message": "Success",
-            "data": {
-                "rate": round(final_rate, 8),
-                "base_rate": round(base_rate, 8),
-                "rate_type": rate_type,
-                "from_currency": from_curr,
-                "to_currency": to_curr
+            return {
+                "code": "200000",
+                "message": "Success",
+                "data": {
+                    "rate": round(final_rate, 8),
+                    "base_rate": round(real_rate, 8),
+                    "rate_type": rate_type,
+                    "from_currency": from_curr,
+                    "to_currency": to_curr,
+                    "source": "kucoin_live"
+                }
             }
-        }
+        else:
+            # Fallback to demo rates if KuCoin fails
+            logging.warning(f"KuCoin API failed, using demo rates for {from_curr}/{to_curr}")
+            
+            # Get base rate from demo data
+            rate_key = f"{from_curr}_{to_curr}"
+            base_rate = DEMO_RATES.get(rate_key)
+            
+            if base_rate is None:
+                # Try reverse rate
+                reverse_key = f"{to_curr}_{from_curr}"
+                reverse_rate = DEMO_RATES.get(reverse_key)
+                if reverse_rate:
+                    base_rate = 1 / reverse_rate
+                else:
+                    # Generate random rate if not found
+                    base_rate = round(float(hash(rate_key) % 10000) / 100, 8)
+            
+            # Apply fees based on rate type
+            if rate_type == "fixed":
+                # Fixed rate: 2% fee
+                final_rate = base_rate * 0.98
+            else:
+                # Float rate: 1% fee  
+                final_rate = base_rate * 0.99
+                
+            return {
+                "code": "200000",
+                "message": "Success",
+                "data": {
+                    "rate": round(final_rate, 8),
+                    "base_rate": round(base_rate, 8),
+                    "rate_type": rate_type,
+                    "from_currency": from_curr,
+                    "to_currency": to_curr,
+                    "source": "demo_fallback"
+                }
+            }
         
     except Exception as e:
         logging.error(f"Error getting exchange rate: {e}")
