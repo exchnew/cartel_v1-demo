@@ -284,7 +284,6 @@ test_plan:
   current_focus:
     - "API Page"
   stuck_tasks:
-    - "Exchange Retrieval"
     - "API Page"
   test_all: false
   test_priority: "high_first"
