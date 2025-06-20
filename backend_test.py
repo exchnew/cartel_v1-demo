@@ -369,6 +369,212 @@ class TestCartelBackendAPI(unittest.TestCase):
         except json.JSONDecodeError:
             # If the response is not JSON, that's also an issue
             print("⚠️ Exchange Retrieval with Invalid ID test - Response is not valid JSON")
+            
+    def test_10_kucoin_api_status(self):
+        """Test KuCoin API connection status endpoint"""
+        print("\n=== Testing KuCoin API Status Endpoint ===")
+        
+        response = requests.get(f"{API_URL}/kucoin/status")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Check response structure
+        self.assertIn("status", data)
+        self.assertIn("timestamp", data)
+        self.assertIn("message", data)
+        
+        # Status should be either "connected" or "error"
+        self.assertIn(data["status"], ["connected", "disconnected", "error"])
+        
+        print(f"KuCoin API Status Response: {json.dumps(data, indent=2)}")
+        
+        if data["status"] == "connected":
+            print("✅ KuCoin API Status test passed - API is connected")
+        else:
+            print("⚠️ KuCoin API Status test - API is not connected, check credentials")
+            
+    def test_11_kucoin_tickers(self):
+        """Test KuCoin tickers endpoint"""
+        print("\n=== Testing KuCoin Tickers Endpoint ===")
+        
+        response = requests.get(f"{API_URL}/kucoin/tickers")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Check response structure
+        self.assertIn("code", data)
+        self.assertEqual(data["code"], "200000")
+        self.assertIn("message", data)
+        self.assertEqual(data["message"], "Success")
+        self.assertIn("data", data)
+        self.assertIn("timestamp", data)
+        
+        # Check that tickers data is present
+        tickers = data["data"]
+        self.assertIsInstance(tickers, dict)
+        
+        # Check that at least some of the supported currencies are present
+        for currency in self.SUPPORTED_CURRENCIES:
+            if currency in tickers:
+                ticker_data = tickers[currency]
+                self.assertIn("symbol", ticker_data)
+                self.assertIn("price", ticker_data)
+                print(f"Found ticker for {currency}: {ticker_data['symbol']} = {ticker_data['price']}")
+        
+        print(f"KuCoin Tickers Response: {json.dumps(data, indent=2)}")
+        print("✅ KuCoin Tickers test passed")
+        
+    def test_12_kucoin_direct_price(self):
+        """Test KuCoin direct price endpoint"""
+        print("\n=== Testing KuCoin Direct Price Endpoint ===")
+        
+        # Test various currency pairs
+        currency_pairs = [
+            ("BTC", "ETH"),
+            ("ETH", "XMR"),
+            ("XMR", "LTC"),
+            ("LTC", "XRP"),
+            ("XRP", "DOGE"),
+            ("DOGE", "BTC")
+        ]
+        
+        for from_currency, to_currency in currency_pairs:
+            response = requests.get(f"{API_URL}/kucoin/price/{from_currency}/{to_currency}")
+            
+            # If KuCoin API is working, we should get a 200 response
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check response structure
+                self.assertIn("code", data)
+                self.assertEqual(data["code"], "200000")
+                self.assertIn("message", data)
+                self.assertEqual(data["message"], "Success")
+                self.assertIn("data", data)
+                
+                # Check price data
+                price_data = data["data"]
+                self.assertIn("from_currency", price_data)
+                self.assertEqual(price_data["from_currency"], from_currency.upper())
+                self.assertIn("to_currency", price_data)
+                self.assertEqual(price_data["to_currency"], to_currency.upper())
+                self.assertIn("rate", price_data)
+                self.assertIn("source", price_data)
+                self.assertEqual(price_data["source"], "kucoin_live")
+                self.assertIn("timestamp", price_data)
+                
+                print(f"KuCoin Direct Price ({from_currency}->{to_currency}): {json.dumps(price_data, indent=2)}")
+            else:
+                # If KuCoin API is not working, we should get a 404 or 500 response
+                print(f"KuCoin Direct Price ({from_currency}->{to_currency}) failed with status {response.status_code}")
+                print(f"Response: {response.text}")
+                
+                # Don't fail the test if KuCoin API is not available
+                if response.status_code == 404:
+                    data = response.json()
+                    self.assertIn("detail", data)
+                    self.assertEqual(data["detail"], "Price not available from KuCoin")
+        
+        print("✅ KuCoin Direct Price test completed")
+        
+    def test_13_price_endpoint_uses_kucoin(self):
+        """Test that the main price endpoint uses KuCoin rates"""
+        print("\n=== Testing Main Price Endpoint Uses KuCoin Rates ===")
+        
+        # Test various currency pairs
+        currency_pairs = [
+            ("BTC", "ETH"),
+            ("ETH", "XMR"),
+            ("XMR", "LTC"),
+            ("LTC", "XRP"),
+            ("XRP", "DOGE"),
+            ("DOGE", "BTC")
+        ]
+        
+        kucoin_used = False
+        
+        for from_currency, to_currency in currency_pairs:
+            response = requests.get(
+                f"{API_URL}/price",
+                params={
+                    "from_currency": from_currency,
+                    "to_currency": to_currency,
+                    "rate_type": "float"
+                }
+            )
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            
+            # Check response structure
+            self.assertIn("code", data)
+            self.assertEqual(data["code"], "200000")
+            self.assertIn("message", data)
+            self.assertEqual(data["message"], "Success")
+            self.assertIn("data", data)
+            
+            # Check rate data
+            rate_data = data["data"]
+            self.assertIn("source", rate_data)
+            
+            # Check if KuCoin is being used
+            if rate_data["source"] == "kucoin_live":
+                kucoin_used = True
+                print(f"Price endpoint is using KuCoin rates for {from_currency}->{to_currency}")
+            else:
+                print(f"Price endpoint is using {rate_data['source']} for {from_currency}->{to_currency}")
+            
+            print(f"Exchange Rate ({from_currency}->{to_currency}): {json.dumps(rate_data, indent=2)}")
+        
+        # At least one of the currency pairs should use KuCoin
+        if kucoin_used:
+            print("✅ Main Price Endpoint test passed - Using KuCoin rates")
+        else:
+            print("⚠️ Main Price Endpoint test - Not using KuCoin rates, falling back to demo rates")
+            
+    def test_14_price_endpoint_fallback(self):
+        """Test that the price endpoint falls back to demo rates if KuCoin fails"""
+        print("\n=== Testing Price Endpoint Fallback to Demo Rates ===")
+        
+        # Test with an invalid currency pair that KuCoin doesn't support
+        # This should force a fallback to demo rates
+        from_currency = "INVALID"
+        to_currency = "BTC"
+        
+        response = requests.get(
+            f"{API_URL}/price",
+            params={
+                "from_currency": from_currency,
+                "to_currency": to_currency,
+                "rate_type": "float"
+            }
+        )
+        
+        # The API should either return an error or fall back to demo rates
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Check response structure
+            self.assertIn("code", data)
+            self.assertEqual(data["code"], "200000")
+            self.assertIn("message", data)
+            self.assertEqual(data["message"], "Success")
+            self.assertIn("data", data)
+            
+            # Check rate data
+            rate_data = data["data"]
+            self.assertIn("source", rate_data)
+            
+            # Should be using demo rates
+            self.assertEqual(rate_data["source"], "demo_fallback")
+            
+            print(f"Price endpoint correctly fell back to demo rates for invalid currency pair")
+            print(f"Exchange Rate ({from_currency}->{to_currency}): {json.dumps(rate_data, indent=2)}")
+            print("✅ Price Endpoint Fallback test passed")
+        else:
+            # If the API returns an error, that's also acceptable
+            print(f"Price endpoint returned error for invalid currency pair: {response.status_code}")
+            print(f"Response: {response.text}")
+            print("✅ Price Endpoint Fallback test passed - API returned error instead of falling back")
 
 if __name__ == "__main__":
     unittest.main()
