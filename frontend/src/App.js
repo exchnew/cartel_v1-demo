@@ -564,7 +564,7 @@ const HomePage = () => {
       
       <div className="terms-privacy">
         <p>
-          By creating an exchange, you agree to our <a href="/terms">Terms & Conditions</a> and <a href="/privacy">Privacy Policy</a>
+          By creating an exchange, you agree to our <a href="/#/terms">Terms & Conditions</a> and <a href="/#/privacy">Privacy Policy</a>
         </p>
       </div>
 
