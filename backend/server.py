@@ -302,6 +302,65 @@ async def get_status_checks():
     status_checks = await db.status_checks.find().to_list(1000)
     return [StatusCheck(**status_check) for status_check in status_checks]
 
+# KuCoin API endpoints
+@api_router.get("/kucoin/status")
+async def kucoin_api_status():
+    """Test KuCoin API connection"""
+    try:
+        is_connected = await kucoin_client.test_connection()
+        return {
+            "status": "connected" if is_connected else "disconnected",
+            "timestamp": datetime.utcnow().isoformat(),
+            "message": "KuCoin API connection successful" if is_connected else "KuCoin API connection failed"
+        }
+    except Exception as e:
+        logging.error(f"KuCoin status check failed: {e}")
+        return {
+            "status": "error",
+            "timestamp": datetime.utcnow().isoformat(),
+            "message": f"Error checking KuCoin API: {str(e)}"
+        }
+
+@api_router.get("/kucoin/tickers")
+async def get_kucoin_tickers():
+    """Get all supported tickers from KuCoin"""
+    try:
+        tickers = await kucoin_client.get_all_tickers()
+        return {
+            "code": "200000",
+            "message": "Success",
+            "data": tickers,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        logging.error(f"Error getting KuCoin tickers: {e}")
+        raise HTTPException(status_code=500, detail="Error getting tickers from KuCoin")
+
+@api_router.get("/kucoin/price/{from_currency}/{to_currency}")
+async def get_kucoin_direct_price(from_currency: str, to_currency: str):
+    """Get direct price from KuCoin without fees"""
+    try:
+        real_rate = await kucoin_client.get_price(from_currency.upper(), to_currency.upper())
+        
+        if real_rate:
+            return {
+                "code": "200000",
+                "message": "Success",
+                "data": {
+                    "from_currency": from_currency.upper(),
+                    "to_currency": to_currency.upper(),
+                    "rate": round(real_rate, 8),
+                    "source": "kucoin_live",
+                    "timestamp": datetime.utcnow().isoformat()
+                }
+            }
+        else:
+            raise HTTPException(status_code=404, detail="Price not available from KuCoin")
+            
+    except Exception as e:
+        logging.error(f"Error getting direct KuCoin price: {e}")
+        raise HTTPException(status_code=500, detail="Error getting price from KuCoin")
+
 # Include the router in the main app
 app.include_router(api_router)
 
