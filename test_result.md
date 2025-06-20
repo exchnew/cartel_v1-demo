@@ -281,9 +281,8 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus:
-    - "API Page"
-  stuck_tasks:
+  current_focus: []
+  stuck_tasks: []
 
 frontend:
   - task: "API Page"
