@@ -13,6 +13,9 @@ class TestCartelBackendAPI(unittest.TestCase):
     
     # Class variable to store exchange ID between tests
     exchange_id = None
+    
+    # Supported currencies for testing
+    SUPPORTED_CURRENCIES = ["BTC", "ETH", "XMR", "LTC", "XRP", "DOGE"]
 
     def test_01_api_health_check(self):
         """Test the API health check endpoint"""
