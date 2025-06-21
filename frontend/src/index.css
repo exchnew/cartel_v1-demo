@@ -319,8 +319,8 @@ body::before {
 /* Exchange type styles */
 .exchange-type {
     display: flex;
-    gap: 12px;
-    margin: 24px 0;
+    gap: 8px;
+    margin: 12px 0;
 }
 
 .type-option {
@@ -328,11 +328,12 @@ body::before {
     background: #2C303A;
     border: 1px solid #3A3F4C;
     border-radius: 8px;
-    padding: 12px;
+    padding: 8px;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
     user-select: none;
+    font-size: 12px;
 }
 
 .type-option:hover {
