@@ -755,9 +755,9 @@ body::before {
 }
 
 .modal-currency-icon {
-    width: 40px;
-    height: 40px;
-    margin-right: 15px;
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
