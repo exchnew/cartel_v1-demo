@@ -49,12 +49,17 @@ const Header = ({ onMobileMenuToggle, mobileMenuOpen }) => {
         </div>
         
         <nav className={`main-navigation ${mobileMenuOpen ? 'active' : ''}`}>
+          {/* Mobile menu close button */}
+          <div className="mobile-menu-close" onClick={onMobileMenuToggle}>
+            <i className="fas fa-times"></i>
+          </div>
+          
           <ul className="nav-list">
-            <li><a href="/#/terms">Terms & Conditions</a></li>
-            <li><a href="/#/privacy">Privacy Policy</a></li>
-            <li><a href="/#/support">Support</a></li>
-            <li><a href="/#/partners">Partners</a></li>
-            <li><a href="/#/api">API</a></li>
+            <li><a href="/#/terms" onClick={onMobileMenuToggle}>Terms & Conditions</a></li>
+            <li><a href="/#/privacy" onClick={onMobileMenuToggle}>Privacy Policy</a></li>
+            <li><a href="/#/support" onClick={onMobileMenuToggle}>Support</a></li>
+            <li><a href="/#/partners" onClick={onMobileMenuToggle}>Partners</a></li>
+            <li><a href="/#/api" onClick={onMobileMenuToggle}>API</a></li>
           </ul>
         </nav>
         
