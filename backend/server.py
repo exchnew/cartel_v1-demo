@@ -338,6 +338,9 @@ async def get_status_checks():
 # Include API routes
 app.include_router(api_router)
 
+# Include Admin routes
+app.include_router(admin_router)
+
 @app.get("/")
 async def root():
     return {"message": "CARTEL Exchange API", "version": "1.0.0", "status": "operational"}
