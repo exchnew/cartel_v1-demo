@@ -1,5 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
@@ -16,6 +17,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from kucoin_service import blockchain_monitor
 from crypto_rates_service import kucoin_rates_service
+from admin_api import create_admin_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
