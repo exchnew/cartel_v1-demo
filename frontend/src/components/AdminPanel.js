@@ -380,6 +380,7 @@ const AdminDashboard = ({ user, onLogout }) => {
               <th>Status</th>
               <th>API Key</th>
               <th>Referral Code</th>
+              <th>Referral URL</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -391,13 +392,26 @@ const AdminDashboard = ({ user, onLogout }) => {
                 <td>{partner.commission_rate}%</td>
                 <td className={`status ${partner.status}`}>{partner.status}</td>
                 <td className="api-key">{partner.api_key}</td>
-                <td>{partner.referral_code}</td>
+                <td className="referral-code">{partner.referral_code}</td>
+                <td className="referral-url">
+                  {partner.referral_url && (
+                    <a href={partner.referral_url} target="_blank" rel="noopener noreferrer">
+                      {partner.referral_url}
+                    </a>
+                  )}
+                </td>
                 <td>
                   <button 
                     className="btn-edit"
                     onClick={() => handleEditPartner(partner)}
                   >
                     Edit
+                  </button>
+                  <button 
+                    className="btn-view"
+                    onClick={() => handleViewPartner(partner)}
+                  >
+                    API Info
                   </button>
                   <button 
                     className="btn-delete"
