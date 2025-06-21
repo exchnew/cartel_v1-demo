@@ -3,6 +3,8 @@ import { HashRouter as Router, Routes, Route, useNavigate } from "react-router-d
 import "./App.css";
 import axios from "axios";
 import ConfirmationPage from "./components/ConfirmationPage";
+import AdminPanel from "./components/AdminPanel";
+import "./components/AdminPanel.css";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
