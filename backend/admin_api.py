@@ -54,7 +54,7 @@ class AdminService:
         return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 def create_admin_router(db: AsyncIOMotorDatabase) -> APIRouter:
-    router = APIRouter(prefix="/admin", tags=["Admin"])
+    router = APIRouter(prefix="/api/admin", tags=["Admin"])
     admin_service = AdminService(db)
     
     # Authentication endpoints
