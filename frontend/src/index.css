@@ -774,18 +774,18 @@ body::before {
 }
 
 .modal-currency-name {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     color: #fff;
 }
 
 .modal-network-name {
-    font-size: 14px;
+    font-size: 12px;
     color: #999;
 }
 
 .address-input-container {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .address-input-container label {
