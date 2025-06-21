@@ -76,6 +76,7 @@ const AdminDashboard = ({ user, onLogout }) => {
   const [showViewExchangeModal, setShowViewExchangeModal] = useState(false);
   const [showEditPartnerModal, setShowEditPartnerModal] = useState(false);
   const [showCreatePartnerModal, setShowCreatePartnerModal] = useState(false);
+  const [showPartnerApiModal, setShowPartnerApiModal] = useState(false);
   const [selectedExchange, setSelectedExchange] = useState(null);
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [editingExchange, setEditingExchange] = useState(null);
