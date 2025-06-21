@@ -6,6 +6,9 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
+
+# Configure logger
+logger = logging.getLogger(__name__)
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import uuid
