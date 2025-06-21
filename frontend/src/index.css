@@ -198,13 +198,13 @@ body::before {
 }
 
 .exchange-section {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .section-label {
     color: #808080;
-    font-size: 14px;
-    margin-bottom: 8px;
+    font-size: 12px;
+    margin-bottom: 4px;
 }
 
 /* Amount input styles */
@@ -213,11 +213,11 @@ body::before {
     background: #2C303A;
     border: 1px solid #3A3F4C;
     border-radius: 8px;
-    padding: 12px;
+    padding: 8px;
     color: #fff;
-    font-size: 16px;
+    font-size: 14px;
     outline: none;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .amount-input:focus {
