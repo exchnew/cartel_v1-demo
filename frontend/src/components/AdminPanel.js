@@ -362,6 +362,14 @@ const AdminDashboard = ({ user, onLogout }) => {
   const PartnersContent = () => (
     <div className="admin-content">
       <h2>Partners Management</h2>
+      <div className="table-actions">
+        <button 
+          className="btn-create"
+          onClick={handleCreatePartner}
+        >
+          <i className="fas fa-plus"></i> Create Partner
+        </button>
+      </div>
       <div className="table-container">
         <table className="admin-table">
           <thead>
@@ -385,8 +393,18 @@ const AdminDashboard = ({ user, onLogout }) => {
                 <td className="api-key">{partner.api_key}</td>
                 <td>{partner.referral_code}</td>
                 <td>
-                  <button className="btn-edit">Edit</button>
-                  <button className="btn-delete">Delete</button>
+                  <button 
+                    className="btn-edit"
+                    onClick={() => handleEditPartner(partner)}
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    className="btn-delete"
+                    onClick={() => handleDeletePartner(partner.id)}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
