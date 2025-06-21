@@ -190,8 +190,11 @@ body::before {
 .exchange-form {
     background: #1A1D26;
     border-radius: 16px;
-    padding: 24px;
+    padding: 12px;
     margin-bottom: 20px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .exchange-section {
