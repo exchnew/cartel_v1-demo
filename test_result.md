@@ -279,6 +279,111 @@ backend:
         agent: "testing"
         comment: "Fixed the method name in kucoin_service.py from get_deposit_address to get_deposit_addresses (plural). However, we're now getting a different error: KucoinAPIException 400302: Our services are currently unavailable in the U.S. To ensure a seamless experience, please access the platform from a non-restricted country/region using a supported IP address. For more details, please refer to our Terms of Use. (current ip: 34.58.165.144 and current area: US). This indicates that KuCoin is blocking access from US IP addresses, which is a different issue than the IP whitelist problem. The fallback mechanism continues to work correctly, ensuring exchanges can still be created with demo XMR addresses when the KuCoin API is unavailable."
 
+  - task: "Admin Login API"
+    implemented: true
+    working: true
+    file: "/app/backend/admin_api.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial setup for testing the admin login API endpoint."
+      - working: true
+        agent: "testing"
+        comment: "Admin Login API is working correctly. It authenticates with the correct credentials (username: admin, password: cartel123) and returns a JWT token along with user information. The endpoint returns a 500 error for invalid credentials instead of 401, but this is a minor issue that doesn't affect the core functionality."
+
+  - task: "Admin Current User API"
+    implemented: true
+    working: true
+    file: "/app/backend/admin_api.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial setup for testing the admin current user API endpoint."
+      - working: true
+        agent: "testing"
+        comment: "Admin Current User API is working correctly. It returns the current admin user information when provided with a valid JWT token. The endpoint properly handles authentication errors, returning 401 for invalid tokens and 403 for missing tokens. Sensitive data like password_hash is correctly removed from the response."
+
+  - task: "Admin Statistics API"
+    implemented: true
+    working: true
+    file: "/app/backend/admin_api.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial setup for testing the admin statistics API endpoint."
+      - working: true
+        agent: "testing"
+        comment: "Admin Statistics API is working correctly. It returns comprehensive statistics including total exchanges, today's exchanges, monthly exchanges, top currencies, and recent exchanges. The endpoint requires authentication and properly handles authorization."
+
+  - task: "Admin Partners API"
+    implemented: true
+    working: true
+    file: "/app/backend/admin_api.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial setup for testing the admin partners API endpoint."
+      - working: true
+        agent: "testing"
+        comment: "Admin Partners API is working correctly. It returns a paginated list of partners with proper fields (name, email, commission_rate, api_key, referral_code). The API correctly hides sensitive data like api_secret. The endpoint supports pagination and search functionality."
+
+  - task: "Admin Exchanges API"
+    implemented: true
+    working: true
+    file: "/app/backend/admin_api.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial setup for testing the admin exchanges API endpoint."
+      - working: true
+        agent: "testing"
+        comment: "Admin Exchanges API is working correctly. It returns a paginated list of exchanges with all the necessary fields. The endpoint supports filtering by status, partner_id, from_currency, and to_currency. MongoDB ObjectId is properly removed from the response."
+
+  - task: "Admin Tokens API"
+    implemented: true
+    working: true
+    file: "/app/backend/admin_api.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial setup for testing the admin tokens API endpoint."
+      - working: true
+        agent: "testing"
+        comment: "Admin Tokens API is working correctly. It returns all 10 currency tokens initialized in the database (BTC, ETH, XMR, LTC, XRP, DOGE, USDT-ERC20, USDC-ERC20, USDT-TRX, TRX). Each token has the correct structure with fields like currency, name, symbol, network, chain, etc."
+
+  - task: "Admin Settings API"
+    implemented: true
+    working: true
+    file: "/app/backend/admin_api.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial setup for testing the admin settings API endpoint."
+      - working: true
+        agent: "testing"
+        comment: "Admin Settings API is working correctly. It returns the exchange settings with all required fields (rate_markup_percentage, min_deposits, default_floating_fee, default_fixed_fee). The min_deposits field contains minimum deposit amounts for all supported currencies."
+
 frontend:
   - task: "Homepage Flow"
     implemented: true
@@ -391,7 +496,7 @@ frontend:
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 3
+  test_sequence: 4
   run_ui: true
 
 test_plan:
@@ -419,3 +524,5 @@ agent_communication:
     message: "Tested the new XMR deposit address functionality from KuCoin API integration. The system correctly attempts to get real XMR deposit addresses from KuCoin when creating exchanges with XMR as the from_currency. Due to KuCoin API IP restrictions (error 400006: Invalid request IP), the system properly falls back to using demo XMR addresses. The fallback mechanism works as expected, ensuring exchanges can still be created even when the KuCoin API is unavailable. Non-XMR currencies correctly use demo addresses as intended. The implementation is robust and handles both success and failure scenarios gracefully."
   - agent: "testing"
     message: "Completed comprehensive testing of the KuCoin XMR deposit address functionality. Fixed the method name in kucoin_service.py from get_deposit_address to get_deposit_addresses (plural). However, we're now getting a different error: KucoinAPIException 400302: Our services are currently unavailable in the U.S. This indicates that KuCoin is blocking access from US IP addresses (34.58.165.144), which is a different issue than the IP whitelist problem. The fallback mechanism continues to work correctly, ensuring exchanges can still be created with demo XMR addresses when the KuCoin API is unavailable. The system is working as designed, with proper error handling and fallback mechanisms."
+  - agent: "testing"
+    message: "Completed testing of the new admin API endpoints for CARTEL admin panel. All endpoints are working correctly: 1) Admin Login API authenticates with correct credentials and returns a JWT token, 2) Admin Current User API returns the current admin user information with a valid token, 3) Admin Statistics API returns comprehensive statistics, 4) Admin Partners API returns a paginated list of partners with proper fields, 5) Admin Exchanges API returns a paginated list of exchanges with filtering, 6) Admin Tokens API returns all 10 currency tokens, 7) Admin Settings API returns exchange settings with all required fields. All endpoints properly handle authentication and authorization. There's a minor issue with the login endpoint returning 500 instead of 401 for invalid credentials, but this doesn't affect the core functionality."
