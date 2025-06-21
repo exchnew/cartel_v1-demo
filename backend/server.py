@@ -232,41 +232,55 @@ async def get_currencies():
 
 @api_router.get("/price")
 async def get_exchange_rate(from_currency: str, to_currency: str, rate_type: str = "float"):
-    """Get exchange rate between two currencies using real-time data"""
+    """Get exchange rate between two currencies with fallback to demo rates"""
     try:
-        # Validate currencies
         from_curr = from_currency.upper()
         to_curr = to_currency.upper()
         
         if from_curr == to_curr:
             raise HTTPException(status_code=400, detail="From and to currencies cannot be the same")
         
-        # Get real-time rate from KuCoin ONLY
-        rate = await kucoin_rates_service.get_price(from_curr, to_curr)
+        # Try to get real-time rate from KuCoin first
+        try:
+            base_rate = await kucoin_rates_service.get_price(from_curr, to_curr)
+            source = "kucoin_live"
+        except Exception as e:
+            logger.warning(f"KuCoin API failed, falling back to demo rates: {e}")
+            base_rate = None
+            source = "demo_fallback"
         
-        if rate is None:
-            # NO FALLBACK - show error if KuCoin API fails
-            raise HTTPException(
-                status_code=503, 
-                detail=f"Exchange rate service temporarily unavailable. Unable to get rate for {from_curr}/{to_curr} from KuCoin API"
-            )
-        
-        source = "kucoin_live"
+        # Fallback to demo rates if KuCoin fails
+        if base_rate is None:
+            rate_key = f"{from_curr}-{to_curr}"
+            reverse_rate_key = f"{to_curr}-{from_curr}"
+            
+            if rate_key in DEMO_RATES:
+                base_rate = DEMO_RATES[rate_key]
+            elif reverse_rate_key in DEMO_RATES:
+                base_rate = 1 / DEMO_RATES[reverse_rate_key]
+            else:
+                raise HTTPException(
+                    status_code=503, 
+                    detail=f"Exchange rate service temporarily unavailable. Unable to get rate for {from_curr}/{to_curr}"
+                )
         
         # Apply fees based on rate type
         if rate_type == "fixed":
             # Fixed rate: 2% fee
-            final_rate = rate * 0.98
+            final_rate = base_rate * 0.98
+            fee_percentage = 2.0
         else:
             # Float rate: 1% fee  
-            final_rate = rate * 0.99
+            final_rate = base_rate * 0.99
+            fee_percentage = 1.0
         
         return {
             "code": "200000",
-            "message": "Success",
+            "message": "Success", 
             "data": {
                 "rate": round(final_rate, 8),
-                "base_rate": round(rate, 8),
+                "base_rate": round(base_rate, 8),
+                "fee_percentage": fee_percentage,
                 "rate_type": rate_type,
                 "from_currency": from_curr,
                 "to_currency": to_curr,
@@ -274,8 +288,10 @@ async def get_exchange_rate(from_currency: str, to_currency: str, rate_type: str
             }
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logging.error(f"Error getting exchange rate: {e}")
+        logger.error(f"Error getting exchange rate: {e}")
         raise HTTPException(status_code=500, detail="Error getting exchange rate")
 
 @api_router.post("/exchange", response_model=Exchange)
