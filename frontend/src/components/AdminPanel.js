@@ -366,7 +366,8 @@ const AdminDashboard = ({ user, onLogout }) => {
 
   // Function to handle viewing partner API info
   const handleViewPartner = (partner) => {
-    alert(`API Key: ${partner.api_key}\nReferral Code: ${partner.referral_code}\nReferral URL: ${partner.referral_url}`);
+    setSelectedPartner(partner);
+    setShowPartnerApiModal(true);
   };
   // Partners Tab Content
   const PartnersContent = () => (
