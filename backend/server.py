@@ -46,6 +46,9 @@ api_router = APIRouter(prefix="/api")
 # Create admin router
 admin_router = create_admin_router(db)
 
+# Create partner API router  
+partner_api_router = create_partner_api_router(db)
+
 # Models
 class StatusCheck(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
