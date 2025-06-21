@@ -18,6 +18,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from kucoin_service import blockchain_monitor
 from crypto_rates_service import kucoin_rates_service
 from admin_api import create_admin_router
+from partner_api import create_partner_api_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
