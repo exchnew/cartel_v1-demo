@@ -309,33 +309,6 @@ const ConfirmationPage = () => {
         }, 5000 + Math.random() * 5000); // Start after 5-10 seconds
     };
 
-    // Function to simulate status progression for demo purposes
-    const startDemoStatusProgression = (exchangeId) => {
-        // Simulate receiving payment after 5-10 seconds
-        setTimeout(() => {
-            handleStatusUpdate('received', 'demo_tx_' + Math.random().toString(36).substr(2, 9), 0, 2);
-            
-            // Simulate confirmations increasing
-            let confirmationCount = 0;
-            const confirmationInterval = setInterval(() => {
-                confirmationCount++;
-                handleStatusUpdate('received', 'demo_tx_hash', confirmationCount, 2);
-                
-                if (confirmationCount >= 2) {
-                    clearInterval(confirmationInterval);
-                    
-                    // Move to exchanging status
-                    handleStatusUpdate('exchanging', 'demo_tx_hash');
-                    
-                    // Complete the exchange after 5-8 seconds
-                    setTimeout(() => {
-                        handleStatusUpdate('completed', 'demo_tx_hash');
-                    }, 5000 + Math.random() * 3000);
-                }
-            }, 2000);
-        }, 5000 + Math.random() * 5000);
-    };
-
     useEffect(() => {
         // Get exchange data from location state
         let data = location.state?.exchangeData;
