@@ -520,7 +520,10 @@ const AdminDashboard = ({ user, onLogout }) => {
               <input 
                 type="number" 
                 value={settings.rate_markup_percentage}
-                onChange={() => {/* Handle change */}}
+                onChange={(e) => setSettings({
+                  ...settings, 
+                  rate_markup_percentage: parseFloat(e.target.value)
+                })}
               />
             </div>
             <div className="form-group">
@@ -528,7 +531,10 @@ const AdminDashboard = ({ user, onLogout }) => {
               <input 
                 type="number" 
                 value={settings.partner_rate_difference}
-                onChange={() => {/* Handle change */}}
+                onChange={(e) => setSettings({
+                  ...settings, 
+                  partner_rate_difference: parseFloat(e.target.value)
+                })}
               />
             </div>
           </div>
@@ -540,7 +546,10 @@ const AdminDashboard = ({ user, onLogout }) => {
               <input 
                 type="number" 
                 value={settings.default_floating_fee}
-                onChange={() => {/* Handle change */}}
+                onChange={(e) => setSettings({
+                  ...settings, 
+                  default_floating_fee: parseFloat(e.target.value)
+                })}
               />
             </div>
             <div className="form-group">
@@ -548,7 +557,10 @@ const AdminDashboard = ({ user, onLogout }) => {
               <input 
                 type="number" 
                 value={settings.default_fixed_fee}
-                onChange={() => {/* Handle change */}}
+                onChange={(e) => setSettings({
+                  ...settings, 
+                  default_fixed_fee: parseFloat(e.target.value)
+                })}
               />
             </div>
           </div>
@@ -561,13 +573,25 @@ const AdminDashboard = ({ user, onLogout }) => {
                 <input 
                   type="number" 
                   value={amount}
-                  onChange={() => {/* Handle change */}}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    min_deposits: {
+                      ...settings.min_deposits,
+                      [currency]: parseFloat(e.target.value)
+                    }
+                  })}
                 />
               </div>
             ))}
           </div>
           
-          <button className="btn-save">Save Settings</button>
+          <button 
+            className="btn-save"
+            onClick={handleUpdateSettings}
+            disabled={loading}
+          >
+            {loading ? 'Saving...' : 'Save Settings'}
+          </button>
         </div>
       )}
     </div>
