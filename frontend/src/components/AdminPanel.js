@@ -70,6 +70,16 @@ const AdminDashboard = ({ user, onLogout }) => {
   const [tokens, setTokens] = useState([]);
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  // Modal states
+  const [showEditExchangeModal, setShowEditExchangeModal] = useState(false);
+  const [showViewExchangeModal, setShowViewExchangeModal] = useState(false);
+  const [showEditPartnerModal, setShowEditPartnerModal] = useState(false);
+  const [showCreatePartnerModal, setShowCreatePartnerModal] = useState(false);
+  const [selectedExchange, setSelectedExchange] = useState(null);
+  const [selectedPartner, setSelectedPartner] = useState(null);
+  const [editingExchange, setEditingExchange] = useState(null);
+  const [editingPartner, setEditingPartner] = useState(null);
 
   // Get authentication headers
   const getAuthHeaders = () => ({
