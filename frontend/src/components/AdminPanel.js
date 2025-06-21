@@ -332,6 +332,11 @@ const AdminDashboard = ({ user, onLogout }) => {
     setLoading(false);
   };
 
+  const handleViewPartner = (partner) => {
+    setSelectedPartner(partner);
+    setShowPartnerApiModal(true);
+  };
+
   // Dashboard Tab Content
   const DashboardContent = () => (
     <div className="admin-content">
