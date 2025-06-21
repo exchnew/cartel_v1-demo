@@ -162,6 +162,11 @@ body::before {
     cursor: pointer;
 }
 
+/* Кнопка закрытия мобильного меню - скрыта на десктопе */
+.mobile-menu-close {
+    display: none;
+}
+
 /* Заголовок страницы */
 .page-header {
     text-align: center;
