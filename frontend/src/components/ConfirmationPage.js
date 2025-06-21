@@ -305,6 +305,10 @@ const ConfirmationPage = () => {
                         // Initialize transaction monitoring with real address
                         const transactionMonitor = new TransactionMonitor();
                         setMonitor(transactionMonitor);
+                        
+                        // DEMO MODE: Start automatic status progression for demonstration
+                        startDemoStatusProgression(data.exchangeId);
+                        
                         transactionMonitor.startMonitoring(
                             exchangeDetails.deposit_address,
                             data.fromCurrency,
@@ -314,6 +318,8 @@ const ConfirmationPage = () => {
                     }
                 } catch (error) {
                     console.error('Error fetching exchange details:', error);
+                    // Even if API fails, start demo progression
+                    startDemoStatusProgression(data.exchangeId);
                 }
             })() : null;
 
