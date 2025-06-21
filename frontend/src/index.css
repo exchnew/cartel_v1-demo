@@ -2155,7 +2155,7 @@ body::before {
         background: #1A1D26;  /* Полностью непрозрачный темный фон */
         flex-direction: column;
         transition: right 0.3s ease;
-        padding: 80px 20px 20px;  /* Отступ сверху для header */
+        padding: 20px;  /* Убрал большой отступ сверху */
         overflow-y: auto;
         z-index: 9999;  /* Очень высокий z-index */
         border-left: 3px solid #4A7CFE;
@@ -2166,9 +2166,33 @@ body::before {
         right: 0;
     }
     
+    /* Кнопка закрытия мобильного меню */
+    .mobile-menu-close {
+        display: block;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 24px;
+        color: #fff;
+        cursor: pointer;
+        background: rgba(74, 124, 254, 0.2);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+    
+    .mobile-menu-close:hover {
+        background: rgba(74, 124, 254, 0.4);
+        color: #4A7CFE;
+    }
+    
     .nav-list {
         flex-direction: column;
-        padding: 0;
+        padding: 60px 0 0 0;  /* Отступ сверху под крестик */
         margin: 0;
         background: transparent;
     }
