@@ -156,6 +156,181 @@ const AdminDashboard = ({ user, onLogout }) => {
     if (activeTab === 'settings') loadSettings();
   }, [activeTab]);
 
+  // Exchange operations
+  const handleEditExchange = (exchange) => {
+    setSelectedExchange(exchange);
+    setEditingExchange({
+      from_amount: exchange.from_amount,
+      to_amount: exchange.to_amount,
+      receiving_address: exchange.receiving_address,
+      refund_address: exchange.refund_address || '',
+      status: exchange.status,
+      deposit_hash: exchange.deposit_hash || '',
+      withdrawal_hash: exchange.withdrawal_hash || '',
+      partner_commission: exchange.partner_commission || 0,
+      company_commission: exchange.company_commission || 0,
+      actual_received_amount: exchange.actual_received_amount || '',
+      actual_sent_amount: exchange.actual_sent_amount || '',
+      node_address: exchange.node_address || '',
+      memo: exchange.memo || '',
+      notes: exchange.notes || ''
+    });
+    setShowEditExchangeModal(true);
+  };
+
+  const handleViewExchange = (exchange) => {
+    setSelectedExchange(exchange);
+    setShowViewExchangeModal(true);
+  };
+
+  const handleUpdateExchange = async () => {
+    if (!selectedExchange || !editingExchange) return;
+    
+    try {
+      setLoading(true);
+      await axios.put(
+        `${API}/admin/exchanges/${selectedExchange.id}`, 
+        editingExchange,
+        getAuthHeaders()
+      );
+      
+      // Reload exchanges
+      await loadExchanges();
+      setShowEditExchangeModal(false);
+      setSelectedExchange(null);
+      setEditingExchange(null);
+    } catch (error) {
+      console.error('Error updating exchange:', error);
+    }
+    setLoading(false);
+  };
+
+  // Partner operations
+  const handleEditPartner = (partner) => {
+    setSelectedPartner(partner);
+    setEditingPartner({
+      name: partner.name,
+      email: partner.email,
+      company: partner.company || '',
+      commission_rate: partner.commission_rate,
+      status: partner.status,
+      payout_address: partner.payout_address || '',
+      payout_currency: partner.payout_currency || '',
+      min_payout: partner.min_payout
+    });
+    setShowEditPartnerModal(true);
+  };
+
+  const handleCreatePartner = () => {
+    setEditingPartner({
+      name: '',
+      email: '',
+      company: '',
+      commission_rate: 30,
+      payout_address: '',
+      payout_currency: '',
+      min_payout: 50
+    });
+    setShowCreatePartnerModal(true);
+  };
+
+  const handleUpdatePartner = async () => {
+    if (!selectedPartner || !editingPartner) return;
+    
+    try {
+      setLoading(true);
+      await axios.put(
+        `${API}/admin/partners/${selectedPartner.id}`, 
+        editingPartner,
+        getAuthHeaders()
+      );
+      
+      await loadPartners();
+      setShowEditPartnerModal(false);
+      setSelectedPartner(null);
+      setEditingPartner(null);
+    } catch (error) {
+      console.error('Error updating partner:', error);
+    }
+    setLoading(false);
+  };
+
+  const handleCreatePartnerSubmit = async () => {
+    if (!editingPartner) return;
+    
+    try {
+      setLoading(true);
+      await axios.post(
+        `${API}/admin/partners`, 
+        editingPartner,
+        getAuthHeaders()
+      );
+      
+      await loadPartners();
+      setShowCreatePartnerModal(false);
+      setEditingPartner(null);
+    } catch (error) {
+      console.error('Error creating partner:', error);
+    }
+    setLoading(false);
+  };
+
+  const handleDeletePartner = async (partnerId) => {
+    if (!confirm('Are you sure you want to delete this partner?')) return;
+    
+    try {
+      setLoading(true);
+      await axios.delete(`${API}/admin/partners/${partnerId}`, getAuthHeaders());
+      await loadPartners();
+    } catch (error) {
+      console.error('Error deleting partner:', error);
+    }
+    setLoading(false);
+  };
+
+  // Token operations
+  const handleToggleToken = async (token) => {
+    try {
+      setLoading(true);
+      await axios.put(
+        `${API}/admin/tokens/${token.id}`,
+        { is_active: !token.is_active },
+        getAuthHeaders()
+      );
+      await loadTokens();
+    } catch (error) {
+      console.error('Error toggling token:', error);
+    }
+    setLoading(false);
+  };
+
+  const handleToggleTokenVisibility = async (token) => {
+    try {
+      setLoading(true);
+      await axios.put(
+        `${API}/admin/tokens/${token.id}`,
+        { is_visible: !token.is_visible },
+        getAuthHeaders()
+      );
+      await loadTokens();
+    } catch (error) {
+      console.error('Error toggling token visibility:', error);
+    }
+    setLoading(false);
+  };
+
+  // Settings operations
+  const handleUpdateSettings = async () => {
+    try {
+      setLoading(true);
+      await axios.put(`${API}/admin/settings`, settings, getAuthHeaders());
+      alert('Settings updated successfully!');
+    } catch (error) {
+      console.error('Error updating settings:', error);
+    }
+    setLoading(false);
+  };
+
   // Dashboard Tab Content
   const DashboardContent = () => (
     <div className="admin-content">
