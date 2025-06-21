@@ -813,9 +813,9 @@ body::before {
 }
 
 .validation-message {
-    margin-top: 8px;
-    font-size: 13px;
-    min-height: 20px;
+    margin-top: 4px;
+    font-size: 12px;
+    min-height: 16px;
 }
 
 .validation-error {
