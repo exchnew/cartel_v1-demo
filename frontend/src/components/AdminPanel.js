@@ -406,7 +406,8 @@ const AdminDashboard = ({ user, onLogout }) => {
             <tr>
               <th>ID</th>
               <th>From → To</th>
-              <th>Amount</th>
+              <th>Отправка</th>
+              <th>К получению</th>
               <th>Status</th>
               <th>Partner</th>
               <th>Created</th>
@@ -418,13 +419,24 @@ const AdminDashboard = ({ user, onLogout }) => {
               <tr key={exchange.id}>
                 <td className="exchange-id">{exchange.id.slice(0, 8)}...</td>
                 <td>{exchange.from_currency} → {exchange.to_currency}</td>
-                <td>{exchange.from_amount}</td>
+                <td>{exchange.from_amount} {exchange.from_currency}</td>
+                <td>{exchange.to_amount} {exchange.to_currency}</td>
                 <td className={`status ${exchange.status}`}>{exchange.status}</td>
                 <td>{exchange.partner_id || 'Direct'}</td>
                 <td>{new Date(exchange.created_at).toLocaleDateString()}</td>
                 <td>
-                  <button className="btn-edit">Edit</button>
-                  <button className="btn-view">View</button>
+                  <button 
+                    className="btn-edit"
+                    onClick={() => handleEditExchange(exchange)}
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    className="btn-view"
+                    onClick={() => handleViewExchange(exchange)}
+                  >
+                    View
+                  </button>
                 </td>
               </tr>
             ))}
