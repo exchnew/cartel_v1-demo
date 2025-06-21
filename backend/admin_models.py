@@ -27,6 +27,7 @@ class Partner(BaseModel):
     api_key: str = Field(default_factory=lambda: str(uuid.uuid4()))
     api_secret: str = Field(default_factory=lambda: str(uuid.uuid4()))
     referral_code: str = Field(default_factory=lambda: str(uuid.uuid4())[:8].upper())
+    referral_url: Optional[str] = None
     commission_rate: float = 30.0  # percentage
     status: str = "active"  # active, inactive, suspended
     created_at: datetime = Field(default_factory=datetime.utcnow)
