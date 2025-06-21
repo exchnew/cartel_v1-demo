@@ -364,11 +364,7 @@ const AdminDashboard = ({ user, onLogout }) => {
     </div>
   );
 
-  // Function to handle viewing partner API info
-  const handleViewPartner = (partner) => {
-    setSelectedPartner(partner);
-    setShowPartnerApiModal(true);
-  };
+
   // Partners Tab Content
   const PartnersContent = () => (
     <div className="admin-content">
