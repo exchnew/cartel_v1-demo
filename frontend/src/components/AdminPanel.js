@@ -1187,6 +1187,112 @@ const AdminDashboard = ({ user, onLogout }) => {
           </div>
         </div>
       )}
+
+      {/* Partner API Info Modal */}
+      {showPartnerApiModal && selectedPartner && (
+        <div className="modal-overlay" onClick={() => setShowPartnerApiModal(false)}>
+          <div className="admin-modal api-info-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>API Information: {selectedPartner.name}</h3>
+              <button 
+                className="close-modal"
+                onClick={() => setShowPartnerApiModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="api-section">
+                <h4>🔗 Referral Information</h4>
+                <div className="detail-group">
+                  <label>Referral Code:</label>
+                  <span className="copy-value">{selectedPartner.referral_code}</span>
+                </div>
+                <div className="detail-group">
+                  <label>Referral URL:</label>
+                  <span className="copy-value referral-url">
+                    {selectedPartner.referral_url || `https://cartelex.ch/?ref=${selectedPartner.referral_code}`}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="api-section">
+                <h4>🔑 API Credentials</h4>
+                <div className="detail-group">
+                  <label>API Key:</label>
+                  <span className="copy-value api-key">{selectedPartner.api_key}</span>
+                </div>
+                <div className="detail-group">
+                  <label>API Secret:</label>
+                  <span className="copy-value api-secret">
+                    {selectedPartner.api_secret_display || "***hidden***"}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="api-section">
+                <h4>📋 API Endpoints</h4>
+                <div className="api-endpoint">
+                  <strong>Get Rates:</strong>
+                  <code>GET /api/partner/rates?from_currency=BTC&to_currency=ETH&rate_type=float</code>
+                  <p>Headers: <code>X-API-Key: {selectedPartner.api_key}</code></p>
+                </div>
+                <div className="api-endpoint">
+                  <strong>Get Currencies:</strong>
+                  <code>GET /api/partner/currencies</code>
+                  <p>Headers: <code>X-API-Key: {selectedPartner.api_key}</code></p>
+                </div>
+                <div className="api-endpoint">
+                  <strong>API Status:</strong>
+                  <code>GET /api/partner/status</code>
+                  <p>Headers: <code>X-API-Key: {selectedPartner.api_key}</code></p>
+                </div>
+              </div>
+              
+              <div className="api-section">
+                <h4>💰 Commission Info</h4>
+                <div className="detail-group">
+                  <label>Commission Rate:</label>
+                  <span>{selectedPartner.commission_rate}%</span>
+                </div>
+                <div className="detail-group">
+                  <label>Total Volume:</label>
+                  <span>${selectedPartner.total_volume || 0}</span>
+                </div>
+                <div className="detail-group">
+                  <label>Total Commission:</label>
+                  <span>${selectedPartner.total_commission || 0}</span>
+                </div>
+              </div>
+              
+              <div className="api-section">
+                <h4>📖 Usage Example</h4>
+                <div className="code-example">
+                  <pre>{`curl -X GET "${window.location.origin}/api/partner/rates?from_currency=BTC&to_currency=ETH&rate_type=float" \\
+  -H "X-API-Key: ${selectedPartner.api_key}"`}</pre>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="btn-cancel"
+                onClick={() => setShowPartnerApiModal(false)}
+              >
+                Close
+              </button>
+              <button 
+                className="btn-copy"
+                onClick={() => {
+                  navigator.clipboard.writeText(selectedPartner.api_key);
+                  alert('API Key copied to clipboard!');
+                }}
+              >
+                Copy API Key
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
