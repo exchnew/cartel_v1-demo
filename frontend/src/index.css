@@ -16,11 +16,6 @@ body {
     padding: 0;
     background-color: #0D0E12;
     background: linear-gradient(135deg, #0D0E12 0%, #1A1D26 50%, #0D0E12 100%);
-    background-image: url('/images/cartel-background.svg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
     color: #fff;
     position: relative;
     min-height: 100vh;
@@ -36,6 +31,10 @@ body::before {
     right: 0;
     bottom: 0;
     background-color: rgba(13, 14, 18, 0.92);
+    background-image: url('/images/cartel-background.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     z-index: -1;
 }
 
