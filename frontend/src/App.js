@@ -1174,8 +1174,18 @@ const APIPage = () => {
 function AppLayout({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Close mobile menu when clicking outside
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
+
   return (
     <div className="site-wrapper">
+      {/* Mobile menu overlay */}
+      {mobileMenuOpen && (
+        <div className="mobile-menu-overlay" onClick={closeMobileMenu}></div>
+      )}
+      
       <Header 
         onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
         mobileMenuOpen={mobileMenuOpen}
