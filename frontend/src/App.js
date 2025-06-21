@@ -73,7 +73,7 @@ const Footer = () => {
           <div className="footer-info">
             <div className="footer-logo">
               <img 
-                src="/images/cartel-logo-light.svg" 
+                src="/images/cartel-logo.jpg" 
                 alt="CARTEL" 
                 className="footer-logo-image"
                 onError={(e) => {
