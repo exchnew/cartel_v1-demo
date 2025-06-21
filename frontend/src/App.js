@@ -72,7 +72,17 @@ const Footer = () => {
         <div className="footer-content">
           <div className="footer-info">
             <div className="footer-logo">
-              <span>CARTEL</span>
+              <img 
+                src="/images/cartel-logo-light.png" 
+                alt="CARTEL" 
+                className="footer-logo-image"
+                onError={(e) => {
+                  // Fallback to text if image fails to load
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              <span className="footer-logo-text" style={{display: 'none'}}>CARTEL</span>
             </div>
             <p className="footer-description">
               Secure and anonymous cryptocurrency exchange service with no registration required. 
