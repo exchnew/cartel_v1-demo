@@ -599,6 +599,18 @@ body::before {
     margin-bottom: 20px;
 }
 
+.footer-logo-image {
+    height: 50px;
+    width: auto;
+    transition: opacity 0.3s ease;
+}
+
+.footer-logo-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+}
+
 .footer-logo img {
     height: 60px;
     width: auto;
