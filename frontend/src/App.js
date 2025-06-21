@@ -33,7 +33,7 @@ const Header = ({ onMobileMenuToggle, mobileMenuOpen }) => {
         <div className="logo-container">
           <a href="/" className="logo">
             <img 
-              src="/images/cartel-logo.png" 
+              src="/images/cartel-logo.svg" 
               alt="CARTEL" 
               className="logo-image"
               onError={(e) => {
