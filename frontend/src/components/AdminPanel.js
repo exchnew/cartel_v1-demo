@@ -650,6 +650,522 @@ const AdminDashboard = ({ user, onLogout }) => {
           {activeTab === 'settings' && <SettingsContent />}
         </main>
       </div>
+
+      {/* Edit Exchange Modal */}
+      {showEditExchangeModal && selectedExchange && editingExchange && (
+        <div className="modal-overlay" onClick={() => setShowEditExchangeModal(false)}>
+          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Edit Exchange: {selectedExchange.id.slice(0, 8)}...</h3>
+              <button 
+                className="close-modal"
+                onClick={() => setShowEditExchangeModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>From Amount:</label>
+                  <input
+                    type="number"
+                    value={editingExchange.from_amount}
+                    onChange={(e) => setEditingExchange({
+                      ...editingExchange,
+                      from_amount: parseFloat(e.target.value)
+                    })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>To Amount:</label>
+                  <input
+                    type="number"
+                    value={editingExchange.to_amount}
+                    onChange={(e) => setEditingExchange({
+                      ...editingExchange,
+                      to_amount: parseFloat(e.target.value)
+                    })}
+                  />
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label>Receiving Address:</label>
+                <input
+                  type="text"
+                  value={editingExchange.receiving_address}
+                  onChange={(e) => setEditingExchange({
+                    ...editingExchange,
+                    receiving_address: e.target.value
+                  })}
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Refund Address:</label>
+                <input
+                  type="text"
+                  value={editingExchange.refund_address}
+                  onChange={(e) => setEditingExchange({
+                    ...editingExchange,
+                    refund_address: e.target.value
+                  })}
+                />
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Status:</label>
+                  <select
+                    value={editingExchange.status}
+                    onChange={(e) => setEditingExchange({
+                      ...editingExchange,
+                      status: e.target.value
+                    })}
+                  >
+                    <option value="waiting">Waiting</option>
+                    <option value="received">Payment Received</option>
+                    <option value="exchanging">Exchanging</option>
+                    <option value="completed">Completed</option>
+                    <option value="failed">Failed</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Node Address:</label>
+                  <input
+                    type="text"
+                    value={editingExchange.node_address}
+                    onChange={(e) => setEditingExchange({
+                      ...editingExchange,
+                      node_address: e.target.value
+                    })}
+                  />
+                </div>
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Deposit Hash:</label>
+                  <input
+                    type="text"
+                    value={editingExchange.deposit_hash}
+                    onChange={(e) => setEditingExchange({
+                      ...editingExchange,
+                      deposit_hash: e.target.value
+                    })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Withdrawal Hash:</label>
+                  <input
+                    type="text"
+                    value={editingExchange.withdrawal_hash}
+                    onChange={(e) => setEditingExchange({
+                      ...editingExchange,
+                      withdrawal_hash: e.target.value
+                    })}
+                  />
+                </div>
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Partner Commission:</label>
+                  <input
+                    type="number"
+                    value={editingExchange.partner_commission}
+                    onChange={(e) => setEditingExchange({
+                      ...editingExchange,
+                      partner_commission: parseFloat(e.target.value)
+                    })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Company Commission:</label>
+                  <input
+                    type="number"
+                    value={editingExchange.company_commission}
+                    onChange={(e) => setEditingExchange({
+                      ...editingExchange,
+                      company_commission: parseFloat(e.target.value)
+                    })}
+                  />
+                </div>
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Actual Received:</label>
+                  <input
+                    type="number"
+                    value={editingExchange.actual_received_amount}
+                    onChange={(e) => setEditingExchange({
+                      ...editingExchange,
+                      actual_received_amount: e.target.value
+                    })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Actual Sent:</label>
+                  <input
+                    type="number"
+                    value={editingExchange.actual_sent_amount}
+                    onChange={(e) => setEditingExchange({
+                      ...editingExchange,
+                      actual_sent_amount: e.target.value
+                    })}
+                  />
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label>Memo:</label>
+                <input
+                  type="text"
+                  value={editingExchange.memo}
+                  onChange={(e) => setEditingExchange({
+                    ...editingExchange,
+                    memo: e.target.value
+                  })}
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Notes:</label>
+                <textarea
+                  value={editingExchange.notes}
+                  onChange={(e) => setEditingExchange({
+                    ...editingExchange,
+                    notes: e.target.value
+                  })}
+                  rows="3"
+                />
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="btn-cancel"
+                onClick={() => setShowEditExchangeModal(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn-save"
+                onClick={handleUpdateExchange}
+                disabled={loading}
+              >
+                {loading ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Exchange Modal */}
+      {showViewExchangeModal && selectedExchange && (
+        <div className="modal-overlay" onClick={() => setShowViewExchangeModal(false)}>
+          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Exchange Details: {selectedExchange.id}</h3>
+              <button 
+                className="close-modal"
+                onClick={() => setShowViewExchangeModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="detail-group">
+                <label>Exchange ID:</label>
+                <span>{selectedExchange.id}</span>
+              </div>
+              <div className="detail-group">
+                <label>From → To:</label>
+                <span>{selectedExchange.from_currency} → {selectedExchange.to_currency}</span>
+              </div>
+              <div className="detail-group">
+                <label>Amounts:</label>
+                <span>{selectedExchange.from_amount} → {selectedExchange.to_amount}</span>
+              </div>
+              <div className="detail-group">
+                <label>Receiving Address:</label>
+                <span className="address-value">{selectedExchange.receiving_address}</span>
+              </div>
+              {selectedExchange.refund_address && (
+                <div className="detail-group">
+                  <label>Refund Address:</label>
+                  <span className="address-value">{selectedExchange.refund_address}</span>
+                </div>
+              )}
+              <div className="detail-group">
+                <label>Status:</label>
+                <span className={`status ${selectedExchange.status}`}>{selectedExchange.status}</span>
+              </div>
+              <div className="detail-group">
+                <label>Created:</label>
+                <span>{new Date(selectedExchange.created_at).toLocaleString()}</span>
+              </div>
+              {selectedExchange.deposit_address && (
+                <div className="detail-group">
+                  <label>Deposit Address:</label>
+                  <span className="address-value">{selectedExchange.deposit_address}</span>
+                </div>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="btn-cancel"
+                onClick={() => setShowViewExchangeModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Partner Modal */}
+      {showEditPartnerModal && selectedPartner && editingPartner && (
+        <div className="modal-overlay" onClick={() => setShowEditPartnerModal(false)}>
+          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Edit Partner: {selectedPartner.name}</h3>
+              <button 
+                className="close-modal"
+                onClick={() => setShowEditPartnerModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Name:</label>
+                <input
+                  type="text"
+                  value={editingPartner.name}
+                  onChange={(e) => setEditingPartner({
+                    ...editingPartner,
+                    name: e.target.value
+                  })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Email:</label>
+                <input
+                  type="email"
+                  value={editingPartner.email}
+                  onChange={(e) => setEditingPartner({
+                    ...editingPartner,
+                    email: e.target.value
+                  })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Company:</label>
+                <input
+                  type="text"
+                  value={editingPartner.company}
+                  onChange={(e) => setEditingPartner({
+                    ...editingPartner,
+                    company: e.target.value
+                  })}
+                />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Commission Rate (%):</label>
+                  <input
+                    type="number"
+                    value={editingPartner.commission_rate}
+                    onChange={(e) => setEditingPartner({
+                      ...editingPartner,
+                      commission_rate: parseFloat(e.target.value)
+                    })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Status:</label>
+                  <select
+                    value={editingPartner.status}
+                    onChange={(e) => setEditingPartner({
+                      ...editingPartner,
+                      status: e.target.value
+                    })}
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="suspended">Suspended</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Payout Address:</label>
+                <input
+                  type="text"
+                  value={editingPartner.payout_address}
+                  onChange={(e) => setEditingPartner({
+                    ...editingPartner,
+                    payout_address: e.target.value
+                  })}
+                />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Payout Currency:</label>
+                  <input
+                    type="text"
+                    value={editingPartner.payout_currency}
+                    onChange={(e) => setEditingPartner({
+                      ...editingPartner,
+                      payout_currency: e.target.value
+                    })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Min Payout:</label>
+                  <input
+                    type="number"
+                    value={editingPartner.min_payout}
+                    onChange={(e) => setEditingPartner({
+                      ...editingPartner,
+                      min_payout: parseFloat(e.target.value)
+                    })}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="btn-cancel"
+                onClick={() => setShowEditPartnerModal(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn-save"
+                onClick={handleUpdatePartner}
+                disabled={loading}
+              >
+                {loading ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Partner Modal */}
+      {showCreatePartnerModal && editingPartner && (
+        <div className="modal-overlay" onClick={() => setShowCreatePartnerModal(false)}>
+          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Create New Partner</h3>
+              <button 
+                className="close-modal"
+                onClick={() => setShowCreatePartnerModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Name:</label>
+                <input
+                  type="text"
+                  value={editingPartner.name}
+                  onChange={(e) => setEditingPartner({
+                    ...editingPartner,
+                    name: e.target.value
+                  })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Email:</label>
+                <input
+                  type="email"
+                  value={editingPartner.email}
+                  onChange={(e) => setEditingPartner({
+                    ...editingPartner,
+                    email: e.target.value
+                  })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Company:</label>
+                <input
+                  type="text"
+                  value={editingPartner.company}
+                  onChange={(e) => setEditingPartner({
+                    ...editingPartner,
+                    company: e.target.value
+                  })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Commission Rate (%):</label>
+                <input
+                  type="number"
+                  value={editingPartner.commission_rate}
+                  onChange={(e) => setEditingPartner({
+                    ...editingPartner,
+                    commission_rate: parseFloat(e.target.value)
+                  })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Payout Address:</label>
+                <input
+                  type="text"
+                  value={editingPartner.payout_address}
+                  onChange={(e) => setEditingPartner({
+                    ...editingPartner,
+                    payout_address: e.target.value
+                  })}
+                />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Payout Currency:</label>
+                  <input
+                    type="text"
+                    value={editingPartner.payout_currency}
+                    onChange={(e) => setEditingPartner({
+                      ...editingPartner,
+                      payout_currency: e.target.value
+                    })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Min Payout:</label>
+                  <input
+                    type="number"
+                    value={editingPartner.min_payout}
+                    onChange={(e) => setEditingPartner({
+                      ...editingPartner,
+                      min_payout: parseFloat(e.target.value)
+                    })}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="btn-cancel"
+                onClick={() => setShowCreatePartnerModal(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn-save"
+                onClick={handleCreatePartnerSubmit}
+                disabled={loading}
+              >
+                {loading ? 'Creating...' : 'Create Partner'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
