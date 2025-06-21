@@ -307,12 +307,13 @@ body::before {
 .currency-name {
     font-weight: 500;
     color: #fff;
+    font-size: 14px;
 }
 
 .network-name {
-    font-size: 12px;
+    font-size: 10px;
     color: #888;
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
 /* Exchange type styles */
