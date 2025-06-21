@@ -275,6 +275,42 @@ const ConfirmationPage = () => {
 
     // Function to simulate status progression for demo purposes
     const startDemoStatusProgression = (exchangeId) => {
+        console.log('🎬 Starting DEMO status progression for exchange:', exchangeId);
+        
+        // Simulate receiving payment after 5-10 seconds
+        setTimeout(() => {
+            console.log('🎬 DEMO: Payment received');
+            const demoTxHash = 'demo_' + Math.random().toString(36).substr(2, 16);
+            handleStatusUpdate('received', demoTxHash, 0, requiredConfirmations);
+            
+            // Simulate confirmations increasing
+            let confirmationCount = 0;
+            const confirmationInterval = setInterval(() => {
+                confirmationCount++;
+                console.log(`🎬 DEMO: Confirmation ${confirmationCount}/${requiredConfirmations}`);
+                handleStatusUpdate('received', demoTxHash, confirmationCount, requiredConfirmations);
+                
+                if (confirmationCount >= requiredConfirmations) {
+                    clearInterval(confirmationInterval);
+                    
+                    // Move to exchanging status
+                    setTimeout(() => {
+                        console.log('🎬 DEMO: Exchanging currencies');
+                        handleStatusUpdate('exchanging', demoTxHash);
+                        
+                        // Complete the exchange after 5-8 seconds
+                        setTimeout(() => {
+                            console.log('🎬 DEMO: Exchange completed!');
+                            handleStatusUpdate('completed', demoTxHash);
+                        }, 5000 + Math.random() * 3000);
+                    }, 2000);
+                }
+            }, 2000); // New confirmation every 2 seconds
+        }, 5000 + Math.random() * 5000); // Start after 5-10 seconds
+    };
+
+    // Function to simulate status progression for demo purposes
+    const startDemoStatusProgression = (exchangeId) => {
         // Simulate receiving payment after 5-10 seconds
         setTimeout(() => {
             handleStatusUpdate('received', 'demo_tx_' + Math.random().toString(36).substr(2, 9), 0, 2);
