@@ -790,19 +790,20 @@ body::before {
 
 .address-input-container label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     color: #ccc;
+    font-size: 13px;
 }
 
 .address-input {
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     background-color: rgba(255, 255, 255, 0.07);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #fff;
     border-radius: 8px;
     font-family: 'Inter', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     box-sizing: border-box;
 }
 
