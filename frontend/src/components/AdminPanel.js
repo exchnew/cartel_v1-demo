@@ -478,7 +478,7 @@ const AdminDashboard = ({ user, onLogout }) => {
                   <input 
                     type="checkbox" 
                     checked={token.is_active}
-                    onChange={() => {/* Handle toggle */}}
+                    onChange={() => handleToggleToken(token)}
                   />
                   <span className="slider"></span>
                 </label>
@@ -487,8 +487,18 @@ const AdminDashboard = ({ user, onLogout }) => {
             <p>{token.name}</p>
             <p>Network: {token.network}</p>
             <p>Min: {token.min_amount} | Max: {token.max_amount}</p>
+            <p>
+              <span className={token.is_visible ? 'text-green' : 'text-red'}>
+                {token.is_visible ? 'Visible on site' : 'Hidden from site'}
+              </span>
+            </p>
             <div className="token-actions">
-              <button className="btn-edit">Edit</button>
+              <button 
+                className={`btn-toggle ${token.is_visible ? 'btn-hide' : 'btn-show'}`}
+                onClick={() => handleToggleTokenVisibility(token)}
+              >
+                {token.is_visible ? 'Hide' : 'Show'}
+              </button>
               <button className="btn-upload">Upload Icon</button>
             </div>
           </div>
