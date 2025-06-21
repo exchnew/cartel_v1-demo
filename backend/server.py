@@ -14,7 +14,8 @@ import sys
 
 # Add the backend directory to the path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from kucoin_service import kucoin_client
+from kucoin_service import blockchain_monitor
+from crypto_rates_service import kucoin_rates_service
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -105,6 +106,26 @@ SUPPORTED_CURRENCIES = [
         "currency": "DOGE",
         "name": "Dogecoin",
         "networks": [{"chain": "DOGE", "name": "Dogecoin Network"}]
+    },
+    {
+        "currency": "USDT-ERC20",
+        "name": "Tether USD (ERC20)",
+        "networks": [{"chain": "ETH", "name": "Ethereum Network"}]
+    },
+    {
+        "currency": "USDC-ERC20",
+        "name": "USD Coin (ERC20)",
+        "networks": [{"chain": "ETH", "name": "Ethereum Network"}]
+    },
+    {
+        "currency": "USDT-TRX",
+        "name": "Tether USD (TRX)",
+        "networks": [{"chain": "TRX", "name": "Tron Network"}]
+    },
+    {
+        "currency": "TRX",
+        "name": "Tron",
+        "networks": [{"chain": "TRX", "name": "Tron Network"}]
     }
 ]
 
@@ -142,17 +163,37 @@ DEMO_RATES = {
     'DOGE_XRP': 0.243
 }
 
-def generate_demo_address(currency: str) -> str:
-    """Generate demo addresses for testing"""
-    addresses = {
-        'BTC': '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
-        'ETH': '0x742d35Cc6634C0532925a3b8D8aE000fEd1f9b89',
-        'XMR': '4A7CFE1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF123456',
-        'LTC': 'LQTpS7rKDJp8QVGN5GqZ8j9VzXv2XkZ8R7',
-        'XRP': 'rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH',
-        'DOGE': 'DH5yaieqoZN36fDVciNyRueRGvGLR3mr7L'
+def get_required_confirmations(currency: str) -> int:
+    """Get required confirmations for each currency"""
+    confirmations = {
+        'BTC': 2,
+        'ETH': 15,
+        'XMR': 12,
+        'LTC': 6,
+        'XRP': 500,
+        'DOGE': 500,
+        'USDT-ERC20': 15,  # Same as ETH network
+        'USDC-ERC20': 15,  # Same as ETH network
+        'USDT-TRX': 19,    # Tron network confirmations
+        'TRX': 19          # Tron network confirmations
     }
-    return addresses.get(currency, f"demo-{currency.lower()}-address")
+    return confirmations.get(currency.upper(), 2)
+
+def generate_deposit_address(currency: str) -> str:
+    """Generate real deposit addresses for CARTEL exchange"""
+    addresses = {
+        'BTC': 'bc1qaw6r7sgnxeapt235khxajkrf69dllh0ghvlayf',
+        'ETH': '0xf9248Af718cd86B204029c7678822C1936990e2F',
+        'XMR': '4B7eBm8oFhXdb9HWCJ9fKVYdXmMAkYLqN57Ur75YMtc5P4r37uwsKt3HmWpGcV4Gy5F2Xqqi3p89sgB6cWdcNnDbMEsjSmw',
+        'LTC': 'ltc1q2dgjy8mfutwky6x9x8tuljfewqxqqdqjr7fawh',
+        'XRP': 'r9rAGF9SAAuXLN2GUyuftNDVkPgcQB4Neh',
+        'DOGE': 'DGkA1EJXsH7M4YmKCXNxxpS1WVVGrrEEyf',
+        'USDT-ERC20': '0xf9248Af718cd86B204029c7678822C1936990e2F',  # Same as ETH address for ERC20 tokens
+        'USDC-ERC20': '0xf9248Af718cd86B204029c7678822C1936990e2F',  # Same as ETH address for ERC20 tokens
+        'USDT-TRX': 'TQn9Y2khEsLJW1ChVWFMSMeRDow5KcbLSE',
+        'TRX': 'TQn9Y2khEsLJW1ChVWFMSMeRDow5KcbLSE'
+    }
+    return addresses.get(currency, f"cartel-{currency.lower()}-address")
 
 # API Routes
 @api_router.get("/")
@@ -170,7 +211,7 @@ async def get_currencies():
 
 @api_router.get("/price")
 async def get_exchange_rate(from_currency: str, to_currency: str, rate_type: str = "float"):
-    """Get exchange rate between two currencies using KuCoin API"""
+    """Get exchange rate between two currencies using real-time data"""
     try:
         # Validate currencies
         from_curr = from_currency.upper()
@@ -179,68 +220,38 @@ async def get_exchange_rate(from_currency: str, to_currency: str, rate_type: str
         if from_curr == to_curr:
             raise HTTPException(status_code=400, detail="From and to currencies cannot be the same")
         
-        # Try to get real rate from KuCoin
-        real_rate = await kucoin_client.get_price(from_curr, to_curr)
+        # Get real-time rate from KuCoin ONLY
+        rate = await kucoin_rates_service.get_price(from_curr, to_curr)
         
-        if real_rate:
-            # Apply fees based on rate type
-            if rate_type == "fixed":
-                # Fixed rate: 2% fee
-                final_rate = real_rate * 0.98
-            else:
-                # Float rate: 1% fee  
-                final_rate = real_rate * 0.99
-            
-            return {
-                "code": "200000",
-                "message": "Success",
-                "data": {
-                    "rate": round(final_rate, 8),
-                    "base_rate": round(real_rate, 8),
-                    "rate_type": rate_type,
-                    "from_currency": from_curr,
-                    "to_currency": to_curr,
-                    "source": "kucoin_live"
-                }
-            }
+        if rate is None:
+            # NO FALLBACK - show error if KuCoin API fails
+            raise HTTPException(
+                status_code=503, 
+                detail=f"Exchange rate service temporarily unavailable. Unable to get rate for {from_curr}/{to_curr} from KuCoin API"
+            )
+        
+        source = "kucoin_live"
+        
+        # Apply fees based on rate type
+        if rate_type == "fixed":
+            # Fixed rate: 2% fee
+            final_rate = rate * 0.98
         else:
-            # Fallback to demo rates if KuCoin fails
-            logging.warning(f"KuCoin API failed, using demo rates for {from_curr}/{to_curr}")
-            
-            # Get base rate from demo data
-            rate_key = f"{from_curr}_{to_curr}"
-            base_rate = DEMO_RATES.get(rate_key)
-            
-            if base_rate is None:
-                # Try reverse rate
-                reverse_key = f"{to_curr}_{from_curr}"
-                reverse_rate = DEMO_RATES.get(reverse_key)
-                if reverse_rate:
-                    base_rate = 1 / reverse_rate
-                else:
-                    # Generate random rate if not found
-                    base_rate = round(float(hash(rate_key) % 10000) / 100, 8)
-            
-            # Apply fees based on rate type
-            if rate_type == "fixed":
-                # Fixed rate: 2% fee
-                final_rate = base_rate * 0.98
-            else:
-                # Float rate: 1% fee  
-                final_rate = base_rate * 0.99
-                
-            return {
-                "code": "200000",
-                "message": "Success",
-                "data": {
-                    "rate": round(final_rate, 8),
-                    "base_rate": round(base_rate, 8),
-                    "rate_type": rate_type,
-                    "from_currency": from_curr,
-                    "to_currency": to_curr,
-                    "source": "demo_fallback"
-                }
+            # Float rate: 1% fee  
+            final_rate = rate * 0.99
+        
+        return {
+            "code": "200000",
+            "message": "Success",
+            "data": {
+                "rate": round(final_rate, 8),
+                "base_rate": round(rate, 8),
+                "rate_type": rate_type,
+                "from_currency": from_curr,
+                "to_currency": to_curr,
+                "source": source
             }
+        }
         
     except Exception as e:
         logging.error(f"Error getting exchange rate: {e}")
@@ -251,11 +262,14 @@ async def create_exchange(exchange_data: ExchangeCreate):
     """Create a new exchange"""
     try:
         # Generate deposit address
-        deposit_address = generate_demo_address(exchange_data.from_currency)
+        from_currency = exchange_data.from_currency.upper()
+        
+        # Use real deposit addresses for all currencies
+        deposit_address = generate_deposit_address(from_currency)
         
         # Create exchange object
         exchange = Exchange(
-            from_currency=exchange_data.from_currency.upper(),
+            from_currency=from_currency,
             to_currency=exchange_data.to_currency.upper(),
             from_amount=exchange_data.from_amount,
             to_amount=exchange_data.to_amount,
@@ -306,83 +320,14 @@ async def get_status_checks():
     status_checks = await db.status_checks.find().to_list(1000)
     return [StatusCheck(**status_check) for status_check in status_checks]
 
-# KuCoin API endpoints
-@api_router.get("/kucoin/status")
-async def kucoin_api_status():
-    """Test KuCoin API connection"""
-    try:
-        is_connected = await kucoin_client.test_connection()
-        return {
-            "status": "connected" if is_connected else "disconnected",
-            "timestamp": datetime.utcnow().isoformat(),
-            "message": "KuCoin API connection successful" if is_connected else "KuCoin API connection failed"
-        }
-    except Exception as e:
-        logging.error(f"KuCoin status check failed: {e}")
-        return {
-            "status": "error",
-            "timestamp": datetime.utcnow().isoformat(),
-            "message": f"Error checking KuCoin API: {str(e)}"
-        }
 
-@api_router.get("/kucoin/tickers")
-async def get_kucoin_tickers():
-    """Get all supported tickers from KuCoin"""
-    try:
-        tickers = await kucoin_client.get_all_tickers()
-        return {
-            "code": "200000",
-            "message": "Success",
-            "data": tickers,
-            "timestamp": datetime.utcnow().isoformat()
-        }
-    except Exception as e:
-        logging.error(f"Error getting KuCoin tickers: {e}")
-        raise HTTPException(status_code=500, detail="Error getting tickers from KuCoin")
-
-@api_router.get("/kucoin/price/{from_currency}/{to_currency}")
-async def get_kucoin_direct_price(from_currency: str, to_currency: str):
-    """Get direct price from KuCoin without fees"""
-    try:
-        real_rate = await kucoin_client.get_price(from_currency.upper(), to_currency.upper())
-        
-        if real_rate:
-            return {
-                "code": "200000",
-                "message": "Success",
-                "data": {
-                    "from_currency": from_currency.upper(),
-                    "to_currency": to_currency.upper(),
-                    "rate": round(real_rate, 8),
-                    "source": "kucoin_live",
-                    "timestamp": datetime.utcnow().isoformat()
-                }
-            }
-        else:
-            raise HTTPException(status_code=404, detail="Price not available from KuCoin")
-            
-    except Exception as e:
-        logging.error(f"Error getting direct KuCoin price: {e}")
-        raise HTTPException(status_code=500, detail="Error getting price from KuCoin")
-
-# Include the router in the main app
+# Include API routes
 app.include_router(api_router)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+@app.get("/")
+async def root():
+    return {"message": "CARTEL Exchange API", "version": "1.0.0", "status": "operational"}
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
