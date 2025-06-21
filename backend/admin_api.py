@@ -164,10 +164,15 @@ def create_admin_router(db: AsyncIOMotorDatabase) -> APIRouter:
                 raise HTTPException(status_code=400, detail="Partner with this email already exists")
             
             partner = Partner(**partner_data.dict())
+            
+            # Generate unique referral URL
+            partner.referral_url = f"https://cartelex.ch/?ref={partner.referral_code}"
+            
             await db.partners.insert_one(partner.dict())
             
-            # Remove sensitive data from response
+            # Remove sensitive data from response but show new keys
             partner_dict = partner.dict()
+            partner_dict["api_secret_display"] = partner_dict["api_secret"]  # Show once for copy
             partner_dict["api_secret"] = "***hidden***"
             
             return APIResponse(
