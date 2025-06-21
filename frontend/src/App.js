@@ -1248,6 +1248,10 @@ function App() {
             </AppLayout>
           } 
         />
+        <Route 
+          path="/admin" 
+          element={<AdminPanel />} 
+        />
       </Routes>
     </Router>
   );
