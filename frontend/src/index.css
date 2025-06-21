@@ -231,14 +231,14 @@ body::before {
     background: #2C303A;
     border: 1px solid #3A3F4C;
     border-radius: 8px;
-    padding: 12px;
+    padding: 8px;
     cursor: pointer;
 }
 
 .selected-currency {
     display: flex;
     align-items: center;
-    padding: 8px;
+    padding: 4px;
     background: #2D2F36;
     border-radius: 8px;
     cursor: pointer;
