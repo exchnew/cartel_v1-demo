@@ -2163,6 +2163,11 @@ body::before {
         display: block;
     }
     
+    /* Показываем overlay на мобильных */
+    .mobile-menu-overlay {
+        display: block;
+    }
+    
     .main-navigation {
         position: fixed;
         top: 0;
