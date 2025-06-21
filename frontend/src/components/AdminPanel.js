@@ -1,0 +1,449 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+// Admin Login Component
+const AdminLogin = ({ onLogin }) => {
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await axios.post(`${API}/admin/login`, credentials);
+      if (response.data.success) {
+        localStorage.setItem('admin_token', response.data.data.access_token);
+        localStorage.setItem('admin_user', JSON.stringify(response.data.data.user));
+        onLogin(response.data.data.user);
+      }
+    } catch (error) {
+      setError(error.response?.data?.detail || 'Login failed');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="admin-login-container">
+      <div className="admin-login-form">
+        <h1>CARTEL Admin Panel</h1>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Username:</label>
+            <input
+              type="text"
+              value={credentials.username}
+              onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Password:</label>
+            <input
+              type="password"
+              value={credentials.password}
+              onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+              required
+            />
+          </div>
+          {error && <div className="error-message">{error}</div>}
+          <button type="submit" disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// Admin Dashboard Component
+const AdminDashboard = ({ user, onLogout }) => {
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [stats, setStats] = useState(null);
+  const [partners, setPartners] = useState([]);
+  const [exchanges, setExchanges] = useState([]);
+  const [tokens, setTokens] = useState([]);
+  const [settings, setSettings] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Get authentication headers
+  const getAuthHeaders = () => ({
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('admin_token')}`
+    }
+  });
+
+  // Load dashboard data
+  const loadDashboard = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API}/admin/stats`, getAuthHeaders());
+      setStats(response.data.data);
+    } catch (error) {
+      console.error('Error loading dashboard:', error);
+    }
+    setLoading(false);
+  };
+
+  // Load partners
+  const loadPartners = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API}/admin/partners`, getAuthHeaders());
+      setPartners(response.data.data);
+    } catch (error) {
+      console.error('Error loading partners:', error);
+    }
+    setLoading(false);
+  };
+
+  // Load exchanges
+  const loadExchanges = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API}/admin/exchanges`, getAuthHeaders());
+      setExchanges(response.data.data);
+    } catch (error) {
+      console.error('Error loading exchanges:', error);
+    }
+    setLoading(false);
+  };
+
+  // Load tokens
+  const loadTokens = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API}/admin/tokens`, getAuthHeaders());
+      setTokens(response.data.data);
+    } catch (error) {
+      console.error('Error loading tokens:', error);
+    }
+    setLoading(false);
+  };
+
+  // Load settings
+  const loadSettings = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API}/admin/settings`, getAuthHeaders());
+      setSettings(response.data.data);
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (activeTab === 'dashboard') loadDashboard();
+    if (activeTab === 'partners') loadPartners();
+    if (activeTab === 'exchanges') loadExchanges();
+    if (activeTab === 'tokens') loadTokens();
+    if (activeTab === 'settings') loadSettings();
+  }, [activeTab]);
+
+  // Dashboard Tab Content
+  const DashboardContent = () => (
+    <div className="admin-content">
+      <h2>Dashboard</h2>
+      {stats && (
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h3>Total Exchanges</h3>
+            <p className="stat-value">{stats.total_exchanges}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Active Partners</h3>
+            <p className="stat-value">{stats.active_partners}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Today's Exchanges</h3>
+            <p className="stat-value">{stats.today_exchanges}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Monthly Exchanges</h3>
+            <p className="stat-value">{stats.monthly_exchanges}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  // Partners Tab Content
+  const PartnersContent = () => (
+    <div className="admin-content">
+      <h2>Partners Management</h2>
+      <div className="table-container">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Commission</th>
+              <th>Status</th>
+              <th>API Key</th>
+              <th>Referral Code</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {partners.map(partner => (
+              <tr key={partner.id}>
+                <td>{partner.name}</td>
+                <td>{partner.email}</td>
+                <td>{partner.commission_rate}%</td>
+                <td className={`status ${partner.status}`}>{partner.status}</td>
+                <td className="api-key">{partner.api_key}</td>
+                <td>{partner.referral_code}</td>
+                <td>
+                  <button className="btn-edit">Edit</button>
+                  <button className="btn-delete">Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  // Exchanges Tab Content
+  const ExchangesContent = () => (
+    <div className="admin-content">
+      <h2>Exchanges Management</h2>
+      <div className="table-container">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>From → To</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Partner</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {exchanges.map(exchange => (
+              <tr key={exchange.id}>
+                <td className="exchange-id">{exchange.id.slice(0, 8)}...</td>
+                <td>{exchange.from_currency} → {exchange.to_currency}</td>
+                <td>{exchange.from_amount}</td>
+                <td className={`status ${exchange.status}`}>{exchange.status}</td>
+                <td>{exchange.partner_id || 'Direct'}</td>
+                <td>{new Date(exchange.created_at).toLocaleDateString()}</td>
+                <td>
+                  <button className="btn-edit">Edit</button>
+                  <button className="btn-view">View</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  // Tokens Tab Content
+  const TokensContent = () => (
+    <div className="admin-content">
+      <h2>Currency Tokens Management</h2>
+      <div className="tokens-grid">
+        {tokens.map(token => (
+          <div key={token.id} className="token-card">
+            <div className="token-header">
+              <h3>{token.currency}</h3>
+              <div className="token-controls">
+                <label className="switch">
+                  <input 
+                    type="checkbox" 
+                    checked={token.is_active}
+                    onChange={() => {/* Handle toggle */}}
+                  />
+                  <span className="slider"></span>
+                </label>
+              </div>
+            </div>
+            <p>{token.name}</p>
+            <p>Network: {token.network}</p>
+            <p>Min: {token.min_amount} | Max: {token.max_amount}</p>
+            <div className="token-actions">
+              <button className="btn-edit">Edit</button>
+              <button className="btn-upload">Upload Icon</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Settings Tab Content
+  const SettingsContent = () => (
+    <div className="admin-content">
+      <h2>System Settings</h2>
+      {settings && (
+        <div className="settings-form">
+          <div className="settings-section">
+            <h3>Rate Settings</h3>
+            <div className="form-group">
+              <label>Rate Markup Percentage:</label>
+              <input 
+                type="number" 
+                value={settings.rate_markup_percentage}
+                onChange={() => {/* Handle change */}}
+              />
+            </div>
+            <div className="form-group">
+              <label>Partner Rate Difference:</label>
+              <input 
+                type="number" 
+                value={settings.partner_rate_difference}
+                onChange={() => {/* Handle change */}}
+              />
+            </div>
+          </div>
+          
+          <div className="settings-section">
+            <h3>Commission Settings</h3>
+            <div className="form-group">
+              <label>Default Floating Fee (%):</label>
+              <input 
+                type="number" 
+                value={settings.default_floating_fee}
+                onChange={() => {/* Handle change */}}
+              />
+            </div>
+            <div className="form-group">
+              <label>Default Fixed Fee (%):</label>
+              <input 
+                type="number" 
+                value={settings.default_fixed_fee}
+                onChange={() => {/* Handle change */}}
+              />
+            </div>
+          </div>
+          
+          <div className="settings-section">
+            <h3>Minimum Deposits</h3>
+            {Object.entries(settings.min_deposits || {}).map(([currency, amount]) => (
+              <div key={currency} className="form-group">
+                <label>{currency} Minimum:</label>
+                <input 
+                  type="number" 
+                  value={amount}
+                  onChange={() => {/* Handle change */}}
+                />
+              </div>
+            ))}
+          </div>
+          
+          <button className="btn-save">Save Settings</button>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="admin-dashboard">
+      <header className="admin-header">
+        <div className="admin-header-left">
+          <h1>CARTEL Admin Panel</h1>
+        </div>
+        <div className="admin-header-right">
+          <span>Welcome, {user.username}</span>
+          <button onClick={onLogout} className="btn-logout">Logout</button>
+        </div>
+      </header>
+      
+      <div className="admin-layout">
+        <nav className="admin-sidebar">
+          <ul>
+            <li className={activeTab === 'dashboard' ? 'active' : ''}>
+              <button onClick={() => setActiveTab('dashboard')}>
+                <i className="fas fa-tachometer-alt"></i> Dashboard
+              </button>
+            </li>
+            <li className={activeTab === 'partners' ? 'active' : ''}>
+              <button onClick={() => setActiveTab('partners')}>
+                <i className="fas fa-users"></i> Partners
+              </button>
+            </li>
+            <li className={activeTab === 'exchanges' ? 'active' : ''}>
+              <button onClick={() => setActiveTab('exchanges')}>
+                <i className="fas fa-exchange-alt"></i> Exchanges
+              </button>
+            </li>
+            <li className={activeTab === 'tokens' ? 'active' : ''}>
+              <button onClick={() => setActiveTab('tokens')}>
+                <i className="fas fa-coins"></i> Tokens
+              </button>
+            </li>
+            <li className={activeTab === 'settings' ? 'active' : ''}>
+              <button onClick={() => setActiveTab('settings')}>
+                <i className="fas fa-cog"></i> Settings
+              </button>
+            </li>
+          </ul>
+        </nav>
+        
+        <main className="admin-main">
+          {loading && <div className="loading">Loading...</div>}
+          
+          {activeTab === 'dashboard' && <DashboardContent />}
+          {activeTab === 'partners' && <PartnersContent />}
+          {activeTab === 'exchanges' && <ExchangesContent />}
+          {activeTab === 'tokens' && <TokensContent />}
+          {activeTab === 'settings' && <SettingsContent />}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+// Main Admin Component
+const AdminPanel = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem('admin_token');
+    const savedUser = localStorage.getItem('admin_user');
+    
+    if (token && savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    setLoading(false);
+  }, []);
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_user');
+    setUser(null);
+  };
+
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  return (
+    <div className="admin-app">
+      {user ? (
+        <AdminDashboard user={user} onLogout={handleLogout} />
+      ) : (
+        <AdminLogin onLogin={handleLogin} />
+      )}
+    </div>
+  );
+};
+
+export default AdminPanel;
