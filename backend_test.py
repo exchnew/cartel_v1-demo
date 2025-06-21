@@ -5,7 +5,7 @@ import uuid
 import time
 
 # Get the backend URL from the frontend .env file
-BACKEND_URL = "https://53b3c955-f8ca-4ee7-8e95-ebf4447f7000.preview.emergentagent.com"
+BACKEND_URL = "https://fb5a371d-9607-4268-a7a3-6d7aca3db5a0.preview.emergentagent.com"
 API_URL = f"{BACKEND_URL}/api"
 
 class TestCartelBackendAPI(unittest.TestCase):
