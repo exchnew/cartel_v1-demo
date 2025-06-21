@@ -738,8 +738,8 @@ body::before {
 }
 
 .modal h2 {
-    margin-top: 8px;
-    margin-bottom: 16px;
+    margin-top: 4px;
+    margin-bottom: 12px;
     color: #fff;
     font-size: 18px;
     text-align: center;
@@ -748,10 +748,10 @@ body::before {
 .modal-info {
     display: flex;
     align-items: center;
-    padding: 12px;
+    padding: 10px 12px;
     background-color: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .modal-currency-icon {
