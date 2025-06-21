@@ -83,6 +83,22 @@ body::before {
     color: #fff;
 }
 
+.logo-image {
+    height: 45px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.logo-image:hover {
+    transform: scale(1.05);
+}
+
+.logo-text {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
 .logo img {
     height: 50px;
     width: auto;
